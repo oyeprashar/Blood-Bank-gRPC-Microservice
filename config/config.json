@@ -1,0 +1,12 @@
+{
+  "host": "127.0.0.1",
+  "port": 3306,
+  "database_name": "BloodBankSysDB",
+  "worker_config": {
+      "namespace": "",
+      "temporal_host_port": ""
+    },
+  "max_open_connections": 25,
+  "max_idle_connections": 3,
+  "max_connection_lifetime_seconds": 300
+}

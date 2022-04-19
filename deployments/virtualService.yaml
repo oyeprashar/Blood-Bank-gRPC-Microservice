@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: blood-bank-system-service
+  namespace: 
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - -gateway
+  http:
+    - match:
+        - uri:
+            prefix: /farm.nurture.core.contracts.BloodBankSystemService
+      route:
+        - destination:
+            host: blood-bank-system-service-service
+            port:
+              number: 6000

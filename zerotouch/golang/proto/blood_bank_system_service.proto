@@ -1,0 +1,235 @@
+syntax = "proto3";
+
+package farm.nurture.core.contracts.BloodBankSystemService;
+
+
+
+
+option java_multiple_files = true;
+option java_package = "farm.nurture.farm.service.proto";
+option go_package = "BloodBankSystemService/BloodBankSystemService";
+
+message RequestHeaders {
+    string prefferedUserName = 1;
+    string clientId = 2;
+    string tracingId = 3;
+    bool traceDetails = 4;
+    enum LANGUAGE {
+      English = 0;
+      Hindi = 2;
+    }
+    LANGUAGE language = 5;
+
+    float latitude = 6;
+    float longitude = 7;
+    float accuracy = 8;
+
+    enum COUNTRY {
+      India = 0;
+      Australia = 2;
+    }
+    COUNTRY country = 9;
+
+    string experimentId = 10;
+    repeated Attribs attribs = 11;
+
+    string authToken = 12;
+    string appToken = 13;
+
+}
+
+message Attribs {
+	string key = 1;
+	string value = 2;
+}
+
+message Status {
+  StatusCode status = 1;
+  repeated string  error_messages = 2;
+  int32 internal_error_code = 3;
+}
+
+enum StatusCode {
+  SUCCESS = 0;
+  NOT_FOUND = 1;
+  ZERO_RESULTS = 2;
+  DUPLICATE = 3;
+  LIMIT_EXCEEDED = 4;
+  INVALID_REQUEST = 5;
+  TEMPORARILY_SUSPENDED = 6;
+  OVER_USAGE_LIMIT = 7;
+  REQUEST_DENIED = 8;
+  UNKNOWN_ERROR = 9;
+  DB_FAILURE = 10;
+}
+
+
+
+
+/* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
+				FindPassword					
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */ 
+message FindPasswordRequest {
+    RequestHeaders requestHeaders = 1;
+    bool isStaleAllowed = 2;
+
+	string id = 3;
+}
+message FindPasswordResponseRecord {
+	string password = 1;
+}
+message FindPasswordResponse {
+    Status status = 1;
+    int32 count = 2;
+    repeated Attribs attribs = 3;
+    repeated FindPasswordResponseRecord records= 4;
+}
+
+
+/* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
+				AddUser					
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */ 
+message AddUserRequest {
+    RequestHeaders requestHeaders = 1;
+
+	string id = 2;
+	string password = 3;
+}
+
+
+message BulkAddUserRequest {
+  RequestHeaders requestHeaders = 1;
+ repeated AddUserRequest  requests = 2;
+}
+
+
+message AddUserResponse {
+    Status status = 1;
+    int32 count = 2;
+    string recordId = 3;
+    repeated Attribs attribs = 4;
+    
+}
+
+
+message BulkAddUserResponse {
+  Status status = 1; 
+ int32 count = 2; 
+ repeated AddUserResponse  responses = 3;
+}
+
+
+
+
+/* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
+				FindBlood					
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */ 
+message FindBloodRequest {
+    RequestHeaders requestHeaders = 1;
+    bool isStaleAllowed = 2;
+
+	string bloodType = 3;
+	string location = 4;
+}
+message FindBloodResponseRecord {
+	string name = 1;
+	string location = 2;
+	string bloodType = 3;
+	string gender = 4;
+	string phoneNumber = 5;
+}
+message FindBloodResponse {
+    Status status = 1;
+    int32 count = 2;
+    repeated Attribs attribs = 3;
+    repeated FindBloodResponseRecord records= 4;
+}
+
+
+/* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
+				AddBlood					
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */ 
+message AddBloodRequest {
+    RequestHeaders requestHeaders = 1;
+
+	string name = 2;
+	string location = 3;
+	string bloodType = 4;
+	string gender = 5;
+	string phoneNumber = 6;
+}
+
+
+message BulkAddBloodRequest {
+  RequestHeaders requestHeaders = 1;
+ repeated AddBloodRequest  requests = 2;
+}
+
+
+message AddBloodResponse {
+    Status status = 1;
+    int32 count = 2;
+    string recordId = 3;
+    repeated Attribs attribs = 4;
+    
+}
+
+
+message BulkAddBloodResponse {
+  Status status = 1; 
+ int32 count = 2; 
+ repeated AddBloodResponse  responses = 3;
+}
+
+
+
+
+/* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
+				 Multi Queries 					
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */ 
+message MultiRequests {
+    bool onTxn = 1;
+    repeated Request request = 2;
+}
+
+message Request {
+    string index = 1;
+    oneof ARequest {
+        		FindPasswordRequest reqFindPassword = 2;
+		AddUserRequest reqAddUser = 3;
+		BulkAddUserRequest reqAddUserBulk = 4;
+		FindBloodRequest reqFindBlood = 5;
+		AddBloodRequest reqAddBlood = 6;
+		BulkAddBloodRequest reqAddBloodBulk = 7;
+
+	}
+}
+
+message MultiResponses {
+    Status status = 1;
+    repeated Response response = 2;
+}
+
+message Response {
+    string index = 1;
+    Status status = 2;
+    oneof AResponse {
+        		FindPasswordResponse resFindPassword = 3;
+		AddUserResponse resAddUser = 4;
+		BulkAddUserResponse resAddUserBulk = 5;
+		FindBloodResponse resFindBlood = 6;
+		AddBloodResponse resAddBlood = 7;
+		BulkAddBloodResponse resAddBloodBulk = 8;
+
+	}
+}
+service BloodBankSystemService {
+    
+	rpc ExecuteFindPassword (FindPasswordRequest ) returns (FindPasswordResponse) {}
+	rpc ExecuteAddUser (AddUserRequest ) returns (AddUserResponse) {}
+	rpc ExecuteAddUserBulk ( BulkAddUserRequest ) returns ( BulkAddUserResponse ) {}
+	rpc ExecuteFindBlood (FindBloodRequest ) returns (FindBloodResponse) {}
+	rpc ExecuteAddBlood (AddBloodRequest ) returns (AddBloodResponse) {}
+	rpc ExecuteAddBloodBulk ( BulkAddBloodRequest ) returns ( BulkAddBloodResponse ) {}
+	rpc Execute (MultiRequests) returns (MultiResponses) {}
+}

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: blood-bank-system-service-service
+  namespace: 
+spec:
+  ports:
+    - name: grpc
+      port: 6000
+      protocol: TCP
+  type: ClusterIP
+  selector:
+    app: blood-bank-system-service

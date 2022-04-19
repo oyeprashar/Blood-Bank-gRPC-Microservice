@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blood-bank-system-service-deployment
+  namespace: 
+spec:
+  selector:
+    matchLabels:
+      app: blood-bank-system-service
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: blood-bank-system-service
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '6005'
+        prometheus.io/path: '/metrics'
+    spec:
+      containers:
+        - image: ecr_link/blood-bank-system-service:prod-latest
+          imagePullPolicy: IfNotPresent
+          name: blood-bank-system-service
+          ports:
+            - containerPort: 6005
+            - containerPort: 6005
+          env:
+            - name: CONFIG_DIR
+              value: /blood-bank-system-service/golang/config
+            - name: ENV
+              value: prod
